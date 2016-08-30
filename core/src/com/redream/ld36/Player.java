@@ -45,58 +45,60 @@ public class Player extends Sprite {
 	}
 	
 	public void tick(){
-		if(!isPlayer && Game.state == Game.STATE_GAME){
-			if(beacon.health <= 0){
-				Game.state = Game.STATE_WON;
-			}
-			Random r = new Random();
-			if(money > GUN_COST && savingForGun){
-				boolean right = r.nextBoolean();
-				if(right){
-					for(int i=buildings.size()-1;i>buildings.size()/2;i--){
-						Building b = buildings.get(i);
-						if(!b.hasGun && b.floors.size() > 0){
-							b.addGun();
-							this.giveMoney(-GUN_COST);
-							savingForGun = false;
-							break;
-						}
-					}
-				}else{
-					for(int i=0;i<buildings.size()/2;i++){
-						Building b = buildings.get(i);
-						if(!b.hasGun && b.floors.size() > 0){
-							b.addGun();
-							this.giveMoney(-GUN_COST);
-							savingForGun = false;
-							break;
-						}
-					}
+		if(Game.state == Game.STATE_GAME){
+			if(!isPlayer){
+				if(beacon.health <= 0){
+					Game.state = Game.STATE_WON;
 				}
-				if(!savingForGun)HUD.showMessage("The enemy has built a cannon!");
-			}
-			if(money > HOUSE_COST && r.nextInt(savingForGun ? (beacon.population < 3 ? 600 : 1400) : 300) == 0){
-				int i = r.nextInt(6) + (rightCount < leftCount ? 0 : (rightCount == leftCount ? 3 : 6) );
-				System.out.println(leftCount+" "+rightCount+" "+i);
-				Building b = buildings.get(i);
-				if(b.canAddFloor()){
-					b.addFloor();
-					this.giveMoney(-HOUSE_COST);
-					if(i<6){
-						rightCount++;
+				Random r = new Random();
+				if(money > GUN_COST && savingForGun){
+					boolean right = r.nextBoolean();
+					if(right){
+						for(int i=buildings.size()-1;i>buildings.size()/2;i--){
+							Building b = buildings.get(i);
+							if(!b.hasGun && b.floors.size() > 0){
+								b.addGun();
+								this.giveMoney(-GUN_COST);
+								savingForGun = false;
+								break;
+							}
+						}
 					}else{
-						leftCount++;
+						for(int i=0;i<buildings.size()/2;i++){
+							Building b = buildings.get(i);
+							if(!b.hasGun && b.floors.size() > 0){
+								b.addGun();
+								this.giveMoney(-GUN_COST);
+								savingForGun = false;
+								break;
+							}
+						}
 					}
+					if(!savingForGun)HUD.showMessage("The enemy has built a cannon!");
 				}
-				
-			}
-			if(beacon.population > 2 && r.nextInt(1000) == 0 && money > 125 && !savingForGun){
-				savingForGun = true;
-				if(!hasGun)HUD.showMessage("The enemy is saving for a cannon!");
-			}
-		}else{
-			if(beacon.health <= 0){
-				Game.state = Game.STATE_LOST;
+				if(money > HOUSE_COST && r.nextInt(savingForGun ? (beacon.population < 3 ? 600 : 1400) : 300) == 0){
+					int i = r.nextInt(6) + (rightCount < leftCount ? 0 : (rightCount == leftCount ? 3 : 6) );
+					System.out.println(leftCount+" "+rightCount+" "+i);
+					Building b = buildings.get(i);
+					if(b.canAddFloor()){
+						b.addFloor();
+						this.giveMoney(-HOUSE_COST);
+						if(i<6){
+							rightCount++;
+						}else{
+							leftCount++;
+						}
+					}
+					
+				}
+				if(beacon.population > 2 && r.nextInt(1000) == 0 && money > 125 && !savingForGun){
+					savingForGun = true;
+					if(!hasGun)HUD.showMessage("The enemy is saving for a cannon!");
+				}
+			}else{
+				if(beacon.health <= 0){
+					Game.state = Game.STATE_LOST;
+				}
 			}
 		}
 		for(Building b : buildings){
