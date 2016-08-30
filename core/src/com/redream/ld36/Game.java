@@ -81,8 +81,9 @@ public class Game extends ApplicationAdapter implements InputListener {
 		
 		state = Game.STATE_MENU;
 		
-		Resources.music.setLooping(true);
-		Resources.music.play();
+		Resources.menu.setLooping(true);
+		Resources.intro.setLooping(true);
+		Resources.menu.play();
 		
 		resetWorld();
 	}
@@ -199,10 +200,18 @@ public class Game extends ApplicationAdapter implements InputListener {
 	private void tick() {
 		if(Gdx.input.isKeyJustPressed(Keys.M)){
 			muted = !muted;
-			Resources.music.setVolume(muted ? 0 : 1);
+			if(muted){
+				Resources.menu.setVolume(0);
+				Resources.intro.setVolume(0);
+			}else{
+				Resources.menu.setVolume(1);
+				Resources.intro.setVolume(1);
+			}
 		}
 		if((Game.state == Game.STATE_INTRO && Game.startGame) 
 				|| ((Game.state == Game.STATE_WON || Game.state == Game.STATE_LOST) && Gdx.input.isKeyJustPressed(Keys.SPACE))){
+			Resources.intro.stop();
+			Resources.menu.play();
 			state = Game.STATE_GAME;
 			this.resetWorld();
 			HUD.showMessage("Use WASD or arrow keys to look around.");
@@ -211,6 +220,8 @@ public class Game extends ApplicationAdapter implements InputListener {
 		}
 		
 		if(state == Game.STATE_MENU && Gdx.input.isKeyPressed(Keys.SPACE)){
+			Resources.menu.stop();
+			Resources.intro.play();
 			state = Game.STATE_INTRO;
 			this.resetWorld();
 			HUD.messageQueue.clear();
