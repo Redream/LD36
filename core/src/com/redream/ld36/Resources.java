@@ -20,8 +20,7 @@ public class Resources {
 	public static Sound build = Gdx.audio.newSound(file("build.wav"));
 	public static Sound cannon = Gdx.audio.newSound(file("cannon.wav"));
 	
-	public static Music song = Gdx.audio.newMusic(file("song.wav"));
-	public static Music intro = Gdx.audio.newMusic(file("intro.wav"));
+	public static Music music = Gdx.audio.newMusic(file("menu.wav"));
 	
 	public static FileHandle file(String src) {
 		return Gdx.files.internal(src);
