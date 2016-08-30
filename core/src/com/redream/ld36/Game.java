@@ -62,6 +62,8 @@ public class Game extends ApplicationAdapter implements InputListener {
 	public static int state;
 	public static boolean startGame;
 	
+	public boolean muted = false;
+	
 	@Override
 	public void create () {
 		Input.registerListener(this);
@@ -194,6 +196,16 @@ public class Game extends ApplicationAdapter implements InputListener {
 	}
 	
 	private void tick() {
+		if(Gdx.input.isKeyJustPressed(Keys.M)){
+			muted = !muted;
+			if(muted){
+				Resources.song.setVolume(0);
+				Resources.intro.setVolume(0);
+			}else{
+				Resources.song.setVolume(1);
+				Resources.intro.setVolume(1);
+			}
+		}
 		if((Game.state == Game.STATE_INTRO && Game.startGame) 
 				|| ((Game.state == Game.STATE_WON || Game.state == Game.STATE_LOST) && Gdx.input.isKeyJustPressed(Keys.SPACE))){
 			Resources.intro.stop();
@@ -201,6 +213,7 @@ public class Game extends ApplicationAdapter implements InputListener {
 			state = Game.STATE_GAME;
 			this.resetWorld();
 			HUD.showMessage("Use WASD or arrow keys to look around.");
+			HUD.showMessage("Press M to mute music.");
 			Game.startGame = false;
 		}
 		
