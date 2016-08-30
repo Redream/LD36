@@ -2,13 +2,15 @@ package com.redream.ld36;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 
 public class Sprite implements InputListener{
 	public float x;
 	public float y;
-	public int z;
+	public int z = 2;
 	
 	public int tex;
 	
@@ -76,12 +78,26 @@ public class Sprite implements InputListener{
 			}else{
 				ar = Resources.regions[this.tex];
 			}
+			loadedTex = tex;
 		}
 		return flip(ar,this.mirrorX,this.mirrorY);
 	}
+	
+	public Vector2 getPosition(){
+		return new Vector2(this.x, this.y);
+	}
 
-	public boolean touchCollTest() {
-		return false;
+	public void setPosition(float x, float y) {
+		this.x = x;
+		this.y = y;
+	}
+	
+	public void setPosition(Vector2 pos) {
+		this.setPosition(pos.x, pos.y);
+	}
+
+	public void setRotation(float f) {
+		this.rot = f;
 	}
 
 	public Rectangle getBounds() {
@@ -119,19 +135,36 @@ public class Sprite implements InputListener{
 	public boolean scrolled(int amount) {
 		return false;
 	}
+	
+	public void render(ShapeRenderer shapeRenderer){
+		return;
+	}
 
 	public void render(SpriteBatch batch) {
-		float dx = x-origX;// - Game.WIDTH / 2;
-		float dy = y-origY;// - Game.HEIGHT / 2;
+		if(tex == 0)return;
+		
+		batch.setProjectionMatrix(Camera.cam.combined);
+		float dx = x-origX;
+		float dy = y-origY;
+		
+		if(!this.applyCam){
+			batch.setProjectionMatrix(Camera.HUDcam.combined);
+			dx -= Game.WIDTH/2;
+		}
 
 		AtlasRegion ar = getTexture();
 		if(width == 0 && height == 0){
 			width = ar.getRegionWidth();
 			height = ar.getRegionHeight();
 		}
-		color = Color.WHITE;
+		
 		batch.setColor(color);
 		batch.draw(ar, dx, dy, origX, origY, width, height, xScale, yScale, rot);
+	}
+
+	@Override
+	public boolean touchColl(int x, int y) {
+		return false;
 	}
 	
 }

@@ -1,12 +1,7 @@
 package com.redream.ld36;
 
-
-import com.badlogic.gdx.math.Rectangle;
-
 public interface InputListener {      
-		public boolean touchCollTest();
-	
-		public Rectangle getBounds();
+		public boolean touchColl(int x, int y);
 		
         public boolean keyDown(int keycode);
 

@@ -7,97 +7,65 @@ import com.badlogic.gdx.math.Vector3;
 
 
 public class Camera {
-	public static boolean disableCollisionX = false;
-	public static boolean disableCollisionY = true;
 	public static int BoundaryX = 10000;
 	public static int BoundaryY = 0;
 	public static int BoundaryStartX = 0 ;
 	public static int BoundaryStartY = 0;
 
 	public static float angle = 0;
-	public static float scrollspeed = 0.05f;
+	public static float scrollspeed = 0;
 
 	public static boolean disable = false;
 
 	public static OrthographicCamera cam;
 	public static OrthographicCamera HUDcam;
-	private static Sprite target;
+	
+	public static float planetRot = 0;
 
 	public static void tick() {
-		if(!disable){
-			if (Gdx.input.isKeyPressed(Keys.NUM_9)) {
-				cam.zoom -= 0.01;
+		if(Game.state == Game.STATE_GAME){
+			if(Gdx.input.isKeyPressed(Keys.D) || Gdx.input.isKeyPressed(Keys.RIGHT)){
+				scrollspeed += 0.02f;
+			}else if(Gdx.input.isKeyPressed(Keys.A) || Gdx.input.isKeyPressed(Keys.LEFT)){
+				scrollspeed -= 0.02f;
+			}else{
+				scrollspeed *= 0.96f;
+			}
+			planetRot += scrollspeed;
+			
+			if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP)) {
+				if(cam.zoom > 0.2f)cam.zoom -= 0.01;
 			}
 
-			if (Gdx.input.isKeyPressed(Keys.NUM_8)) {
-				cam.zoom += 0.01;
+			if (Gdx.input.isKeyPressed(Keys.S) || Gdx.input.isKeyPressed(Keys.DOWN)) {
+				if(cam.zoom < 3f)cam.zoom += 0.01;
 			}
 
-			if (Gdx.input.isKeyPressed(Keys.NUM_0)) {
-				cam.zoom = 1;
-			}
-
-			if (Gdx.input.isKeyPressed(Keys.NUM_6)) {
-				cam.rotate(-0.5f, 0, 0, 1);
-				Camera.angle += 0.5;
-			}
-
-			if (Gdx.input.isKeyPressed(Keys.NUM_5)) {
-				cam.rotate(0.5f, 0, 0, 1);
-				Camera.angle -= 0.5;
-			}
-
-			if (Gdx.input.isKeyPressed(Keys.NUM_7)) {
-				Camera.reset();
-				Camera.updatePos();
-				Camera.angle = 0;
-			}
-
-			if(target != null){
-				final float moveX = (float) (((target.x + (target.width*8)/2 - Game.WIDTH / 2) - cam.position.x) * scrollspeed);
-				final float moveY = (float) (((target.y + (target.height*8)/2 - Game.HEIGHT / 2) - cam.position.y) * scrollspeed);
-				cam.translate(moveX, moveY, 0);
-			}
-		}
-		
-		if(Game.debug)Camera.cam.zoom = 10f;
-
-		if(!Camera.disableCollisionY){
-			if (cam.position.y - (Game.HEIGHT / 2 * (cam.zoom - 1)) < Camera.BoundaryStartY) {
-				cam.position.y = Camera.BoundaryStartY + (Game.HEIGHT / 2 * (cam.zoom - 1));
-			}
-			if (cam.position.y + Game.HEIGHT > Camera.BoundaryY) {
-				cam.position.y = Camera.BoundaryY - Game.HEIGHT;
-			}
-		}
-		if(!Camera.disableCollisionX){
-			if (cam.position.x - (Game.WIDTH / 2 * (cam.zoom - 1)) < Camera.BoundaryStartX) {
-				cam.position.x = Camera.BoundaryStartX + (Game.WIDTH / 2 * (cam.zoom - 1));
-			}
-			if (cam.position.x + Game.WIDTH > Camera.BoundaryX) {
-				cam.position.x = Camera.BoundaryX - Game.WIDTH;
-			}
+			Vector2 pos = new Vector2(0, Game.PLANET_SIZE+40).rotate(-planetRot);
+			cam.position.x = pos.x;
+			cam.position.y = pos.y;
+			cam.rotate(scrollspeed);
 		}
 
 		cam.update();
 	}
-	
-	public static void updatePos(){
-		return;
-//		if(target == null)return;
-//		float goY = (target.y + (target.height*target.yScale)/2 - Game.HEIGHT / 2);
-//		float goX = (target.x + (target.width*target.xScale)/2 - Game.WIDTH / 2);
-//		cam.translate(goX, goY, 0);
-//		cam.update();
-	}
-	
-	public static void setTarget(Sprite target){
-		Camera.target = target;
-	}
 
 	public static void reset() {
 		Camera.cam = new OrthographicCamera(Game.WIDTH, Game.HEIGHT);
-		scrollspeed = 0.05f;
+		Camera.HUDcam = new OrthographicCamera(Game.WIDTH, Game.HEIGHT);
+		Camera.cam.position.x = 0;
+		Camera.cam.position.y = 880;
+		Camera.cam.zoom = 0.5f;
+		Camera.planetRot = 0;
+		Camera.scrollspeed = 0;
+		
+		if(Game.state != Game.STATE_GAME){
+			Camera.cam.zoom = 0.2f;
+			Vector2 pos = new Vector2(0, Game.PLANET_SIZE+40).rotate(-8);
+			cam.position.x = pos.x;
+			cam.position.y = pos.y;
+		}
+		Camera.cam.update();
 	}
 
 	public static Vector2 screenToCoords(Vector2 screen) {

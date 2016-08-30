@@ -5,11 +5,14 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 
 public class Display {
 	public boolean applyCam = true;
 	private final SpriteBatch batch;
+	
+	private final ShapeRenderer shapeRenderer;
 
 	public boolean debug = false;
 
@@ -21,44 +24,32 @@ public class Display {
 	public List<Sprite> renderQueue = new ArrayList<Sprite>();
 	public List<Sprite> renderQueueHUD = new ArrayList<Sprite>();
 
-	private double culldist;
-
-	public Display(SpriteBatch batch) {
+	public Display(SpriteBatch batch, ShapeRenderer shapeRenderer) {
 		this.batch = batch;
+		this.shapeRenderer = shapeRenderer;
 	}
 
 	public void render() {
-		culldist = (Game.DIAGDIST*Camera.cam.zoom)/2;
-
-		Collections.sort(this.renderQueue, this.zSort);
-
-		this.batch.setProjectionMatrix(Camera.cam.combined);
+		Collections.sort(this.renderQueue, zSort);
+		
 		this.renderList(this.renderQueue);
 		
-		this.batch.setProjectionMatrix(Camera.HUDcam.combined);
-		this.renderList(this.renderQueueHUD);
 	}
 
 	private void renderList(List<Sprite> renderQueue) {
 		int rs = renderQueue.size();
+		
 		for (int i = 0; i < rs; i++) {
-			renderQueue.get(i).render(batch);
+			Sprite s = renderQueue.get(i);
+			s.render(shapeRenderer);
+			s.render(batch);
 		}
+		
 	}
 
 	public void queueRender(Sprite r) {
-		if (r.applyCam && this.applyCam) {
-//			float xd = (Camera.cam.position.x+Game.WIDTH/2) - r.x;
-//			float yd = (Camera.cam.position.y+Game.HEIGHT/2) - r.y;
-//			double distance = Math.abs(Math.sqrt(xd*xd+yd*yd)) - Math.max(r.width*r.xScale,r.height*r.yScale);
-//			distance *= 0.8;
-//			if (distance > culldist)
-//				return;
+		this.renderQueue.add(r);
 
-			this.renderQueue.add(r);
-		} else {
-			this.renderQueueHUD.add(r);
-		}
 	}
 
 }
